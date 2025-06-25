@@ -19,6 +19,11 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
   const [isWorkoutComplete, setIsWorkoutComplete] = React.useState(false)
   const [showCountdown, setShowCountdown] = React.useState(true)
   const [currentRound, setCurrentRound] = React.useState(1)
+  const [touchStart, setTouchStart] = React.useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = React.useState<number | null>(null)
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50
 
   const startWorkout = () => {
     setShowCountdown(false)
@@ -33,6 +38,145 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     setIsWorkoutComplete(false)
     setShowCountdown(true)
     setCurrentRound(1)
+  }
+
+  // Common transition functions
+  const transitionToRest = () => {
+    setCurrentPhase('rest')
+    const currentExercise = config.exercises[currentExerciseIndex]
+    const restTime = currentExercise?.restTime || 0
+    setTimeLeft(restTime)
+    audioManager.playPhaseChangeBeep()
+    return restTime
+  }
+
+  const transitionToNextExercise = () => {
+    const nextIndex = currentExerciseIndex + 1
+    setCurrentExerciseIndex(nextIndex)
+    setCurrentPhase('work')
+    const nextExercise = config.exercises[nextIndex]
+    const workTime = nextExercise?.workTime || 0
+    setTimeLeft(workTime)
+    audioManager.playPhaseChangeBeep()
+    return workTime
+  }
+
+  const transitionToRoundBreak = () => {
+    setCurrentPhase('roundBreak')
+    const breakTime = config.roundBreakTime || 30
+    setTimeLeft(breakTime)
+    audioManager.playPhaseChangeBeep()
+    return breakTime
+  }
+
+  const transitionToNextRound = () => {
+    const nextRound = currentRound + 1
+    setCurrentRound(nextRound)
+    setCurrentExerciseIndex(0)
+    setCurrentPhase('work')
+    const firstExercise = config.exercises[0]
+    const workTime = firstExercise?.workTime || 0
+    setTimeLeft(workTime)
+    audioManager.playStartBeep()
+    return workTime
+  }
+
+  const completeWorkout = () => {
+    setIsRunning(false)
+    setIsWorkoutComplete(true)
+    audioManager.playWorkoutCompleteBeep()
+    return 0
+  }
+
+  const goToPreviousExercise = () => {
+    const prevExercise = config.exercises[currentExerciseIndex - 1]
+    if (prevExercise.restTime > 0) {
+      setCurrentExerciseIndex(prev => prev - 1)
+      setCurrentPhase('rest')
+      setTimeLeft(prevExercise.restTime)
+    } else {
+      setCurrentExerciseIndex(prev => prev - 1)
+      setCurrentPhase('work')
+      setTimeLeft(prevExercise.workTime)
+    }
+  }
+
+  const goToPreviousRound = () => {
+    const prevRound = currentRound - 1
+    setCurrentRound(prevRound)
+    setCurrentExerciseIndex(config.exercises.length - 1)
+    setCurrentPhase('roundBreak')
+    setTimeLeft(config.roundBreakTime || 30)
+  }
+
+  // Arrow key handlers
+  const handleRightArrow = () => {
+    if (isWorkoutComplete) {
+      restartWorkout()
+      return
+    }
+    // Skip to next phase or exercise
+    if (currentPhase === 'work') {
+      // Check if this is the last exercise of the current round
+      if (currentExerciseIndex === config.exercises.length - 1) {
+        // Last exercise of current round - check if we need rest
+        if (currentRound < (config.rounds || 1)) {
+          // Not the last round, go to rest first
+          transitionToRest()
+        } else {
+          // Last round, workout complete - no rest needed
+          completeWorkout()
+        }
+      } else {
+        // Not the last exercise, go to rest
+        transitionToRest()
+      }
+    } else if (currentPhase === 'rest') {
+      // Currently in rest, go to next exercise or round
+      if (currentExerciseIndex < config.exercises.length - 1) {
+        // Not the last exercise, go to next exercise
+        transitionToNextExercise()
+      } else {
+        // Last exercise of current round - check if we need to go to next round
+        if (currentRound < (config.rounds || 1)) {
+          transitionToRoundBreak()
+        } else {
+          // Last round, complete workout
+          completeWorkout()
+        }
+      }
+    } else if (currentPhase === 'roundBreak') {
+      // Currently in round break, start next round
+      transitionToNextRound()
+    }
+  }
+
+  const handleLeftArrow = () => {
+    if (isWorkoutComplete) {
+      restartWorkout()
+      return
+    }
+    // Go to previous phase or exercise
+    if (currentPhase === 'rest') {
+      // Go back to work phase of current exercise
+      setCurrentPhase('work')
+      const currentExercise = config.exercises[currentExerciseIndex]
+      setTimeLeft(currentExercise?.workTime || 0)
+    } else if (currentPhase === 'roundBreak') {
+      // Go back to rest phase of last exercise of previous round
+      setCurrentPhase('rest')
+      const lastExercise = config.exercises[config.exercises.length - 1]
+      setTimeLeft(lastExercise?.restTime || 0)
+    } else if (currentPhase === 'work') {
+      // Currently in work, go to previous exercise or round
+      if (currentExerciseIndex > 0) {
+        // Go to previous exercise's rest phase if it exists
+        goToPreviousExercise()
+      } else if (currentRound > 1) {
+        // First exercise of current round, go back to previous round's break
+        goToPreviousRound()
+      }
+    }
   }
 
   // Initialize timer when component mounts
@@ -57,58 +201,33 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
                 // Last exercise of current round - check if we need rest
                 if (currentRound < (config.rounds || 1)) {
                   // Not the last round, go to rest first
-                  setCurrentPhase('rest')
-                  const currentExercise = config.exercises[currentExerciseIndex]
-                  audioManager.playPhaseChangeBeep()
-                  return currentExercise?.restTime || 0
+                  return transitionToRest()
                 } else {
                   // Last round, workout complete - no rest needed
-                  setIsRunning(false)
-                  setIsWorkoutComplete(true)
-                  audioManager.playWorkoutCompleteBeep()
-                  return 0
+                  return completeWorkout()
                 }
               } else {
                 // Move to rest phase
-                setCurrentPhase('rest')
-                const currentExercise = config.exercises[currentExerciseIndex]
-                audioManager.playPhaseChangeBeep()
-                return currentExercise?.restTime || 0
+                return transitionToRest()
               }
             } else if (currentPhase === 'rest') {
               // Rest complete, move to next exercise or round
               if (currentExerciseIndex < config.exercises.length - 1) {
                 // Not the last exercise, go to next exercise
-                const nextIndex = currentExerciseIndex + 1
-                setCurrentExerciseIndex(nextIndex)
-                setCurrentPhase('work')
-                const nextExercise = config.exercises[nextIndex]
-                audioManager.playPhaseChangeBeep()
-                return nextExercise?.workTime || 0
+                return transitionToNextExercise()
               } else {
                 // Last exercise of current round - check if we need to go to next round
                 if (currentRound < (config.rounds || 1)) {
                   // Not the last round, go to round break
-                  setCurrentPhase('roundBreak')
-                  audioManager.playPhaseChangeBeep()
-                  return config.roundBreakTime || 30
+                  return transitionToRoundBreak()
                 } else {
                   // Last round, workout complete
-                  setIsRunning(false)
-                  setIsWorkoutComplete(true)
-                  audioManager.playWorkoutCompleteBeep()
-                  return 0
+                  return completeWorkout()
                 }
               }
             } else if (currentPhase === 'roundBreak') {
               // Round break complete, start next round
-              const nextRound = currentRound + 1
-              setCurrentRound(nextRound)
-              setCurrentExerciseIndex(0)
-              setCurrentPhase('work')
-              const firstExercise = config.exercises[0]
-              audioManager.playStartBeep()
-              return firstExercise?.workTime || 0
+              return transitionToNextRound()
             }
           }
 
@@ -145,104 +264,11 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
           break
         case 'ArrowRight':
           e.preventDefault()
-          if (isWorkoutComplete) {
-            restartWorkout()
-            return
-          }
-          // Skip to next phase or exercise
-          if (currentPhase === 'work') {
-            // Check if this is the last exercise of the current round
-            if (currentExerciseIndex === config.exercises.length - 1) {
-              // Last exercise of current round - check if we need rest
-              if (currentRound < (config.rounds || 1)) {
-                // Not the last round, go to rest first
-                setCurrentPhase('rest')
-                const currentExercise = config.exercises[currentExerciseIndex]
-                setTimeLeft(currentExercise?.restTime || 0)
-              } else {
-                // Last round, workout complete - no rest needed
-                setIsRunning(false)
-                setIsWorkoutComplete(true)
-                audioManager.playWorkoutCompleteBeep()
-              }
-            } else {
-              // Not the last exercise, go to rest
-              setCurrentPhase('rest')
-              const currentExercise = config.exercises[currentExerciseIndex]
-              setTimeLeft(currentExercise?.restTime || 0)
-            }
-          } else if (currentPhase === 'rest') {
-            // Currently in rest, go to next exercise or round
-            if (currentExerciseIndex < config.exercises.length - 1) {
-              // Not the last exercise, go to next exercise
-              const nextIndex = currentExerciseIndex + 1
-              setCurrentExerciseIndex(nextIndex)
-              setCurrentPhase('work')
-              const nextExercise = config.exercises[nextIndex]
-              setTimeLeft(nextExercise?.workTime || 0)
-            } else {
-              // Last exercise of current round - check if we need to go to next round
-              if (currentRound < (config.rounds || 1)) {
-                setCurrentPhase('roundBreak')
-                setTimeLeft(config.roundBreakTime || 30)
-              } else {
-                // Last round, complete workout
-                setIsRunning(false)
-                setIsWorkoutComplete(true)
-                audioManager.playWorkoutCompleteBeep()
-              }
-            }
-          } else if (currentPhase === 'roundBreak') {
-            // Currently in round break, start next round
-            const nextRound = currentRound + 1
-            setCurrentRound(nextRound)
-            setCurrentExerciseIndex(0)
-            setCurrentPhase('work')
-            const firstExercise = config.exercises[0]
-            setTimeLeft(firstExercise?.workTime || 0)
-          }
+          handleRightArrow()
           break
         case 'ArrowLeft':
           e.preventDefault()
-          if (isWorkoutComplete) {
-            restartWorkout()
-            return
-          }
-          // Go to previous phase or exercise
-          if (currentPhase === 'rest') {
-            // Go back to work phase of current exercise
-            setCurrentPhase('work')
-            const currentExercise = config.exercises[currentExerciseIndex]
-            setTimeLeft(currentExercise?.workTime || 0)
-          } else if (currentPhase === 'roundBreak') {
-            // Go back to rest phase of last exercise of previous round
-            setCurrentPhase('rest')
-            const lastExercise = config.exercises[config.exercises.length - 1]
-            setTimeLeft(lastExercise?.restTime || 0)
-          } else if (currentPhase === 'work') {
-            // Currently in work, go to previous exercise or round
-            if (currentExerciseIndex > 0) {
-              // Go to previous exercise's rest phase if it exists
-              const prevExercise = config.exercises[currentExerciseIndex - 1]
-              if (prevExercise.restTime > 0) {
-                setCurrentExerciseIndex(prev => prev - 1)
-                setCurrentPhase('rest')
-                setTimeLeft(prevExercise.restTime)
-              } else {
-                // Previous exercise has no rest, go to its work phase
-                setCurrentExerciseIndex(prev => prev - 1)
-                setCurrentPhase('work')
-                setTimeLeft(prevExercise.workTime)
-              }
-            } else if (currentRound > 1) {
-              // First exercise of current round, go back to previous round's break
-              const prevRound = currentRound - 1
-              setCurrentRound(prevRound)
-              setCurrentExerciseIndex(config.exercises.length - 1)
-              setCurrentPhase('roundBreak')
-              setTimeLeft(config.roundBreakTime || 30)
-            }
-          }
+          handleLeftArrow()
           break
       }
     }
@@ -250,6 +276,32 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
   }, [currentExerciseIndex, currentPhase, currentRound, config.exercises, config.rounds, config.roundBreakTime, isWorkoutComplete, showCountdown])
+
+  // Swipe gesture handlers
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe) {
+      // Simulate right arrow key
+      handleRightArrow()
+    } else if (isRightSwipe) {
+      // Simulate left arrow key
+      handleLeftArrow()
+    }
+  }
 
   const formatTime = (seconds: number) => {
     // Only show seconds, no minutes
@@ -273,6 +325,9 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     <div
       className="timer-screen"
       style={{ backgroundColor }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       <div className="timer-content">
         <div className="timer-display">
@@ -287,7 +342,8 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
           )}
 
           <div className="progress">
-            Round {currentRound} of {config.rounds || 1} • Exercise {currentExerciseIndex + 1} of {config.exercises.length}
+            Round {currentRound} of {config.rounds || 1}
+            {currentPhase !== 'roundBreak' && ` • Exercise ${currentExerciseIndex + 1} of ${config.exercises.length}`}
           </div>
 
           {/* Upcoming exercise display */}
@@ -328,7 +384,7 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
           </button>
         </div>
 
-        <div className="keyboard-hints">
+        <div className="keyboard-hints mobile-hidden">
           <div>Space: {isWorkoutComplete ? 'Restart' : 'Pause/Resume'}</div>
           <div>← →: {isWorkoutComplete ? 'Restart' : 'Previous/Next Phase'}</div>
         </div>

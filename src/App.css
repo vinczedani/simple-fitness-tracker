@@ -248,10 +248,21 @@ body {
 }
 
 .keyboard-hints div {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  opacity: 0.8;
 }
 
-/* Responsive Design */
+.mobile-hidden {
+  display: block;
+}
+
+@media (max-width: 1023px) {
+  .mobile-hidden {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .config-screen {
     padding: 1rem;
@@ -267,7 +278,7 @@ body {
   }
 
   .time {
-    font-size: 8rem;
+    font-size: 14rem;
   }
 
   .phase {
@@ -426,9 +437,20 @@ body {
 
 .rounds-input {
   width: 120px;
-  padding: 0.75rem;
+  padding: 0.5rem;
   border: 1px solid #d1d5db;
   border-radius: 6px;
   text-align: center;
   font-size: 1rem;
+}
+
+.total-time {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #f0f9ff;
+  border: 1px solid #0ea5e9;
+  border-radius: 8px;
+  color: #0c4a6e;
+  font-size: 1.1rem;
+  text-align: center;
 }

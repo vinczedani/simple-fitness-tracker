@@ -41,9 +41,32 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
     })
   }
 
+  const calculateTotalTime = () => {
+    if (config.exercises.length === 0) return 0
+
+    const rounds = config.rounds || 1
+    const roundBreakTime = config.roundBreakTime || 0
+
+    // Calculate time for one round: sum of all work + rest times
+    const timePerRound = config.exercises.reduce((total, exercise) => {
+      return total + exercise.workTime + exercise.restTime
+    }, 0)
+
+    // Total time = (time per round * rounds) + (round breaks * (rounds - 1))
+    const totalTime = (timePerRound * rounds) + (roundBreakTime * (rounds - 1))
+
+    return totalTime
+  }
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`
+  }
+
   return (
     <div className="config-screen">
-      <h1>Fitness Tracker</h1>
+      <h1>Fitness Timer</h1>
 
       <div className="exercises-section">
         <h2>Exercises</h2>
@@ -121,6 +144,9 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
               className="rounds-input"
             />
           </div>
+        </div>
+        <div className="total-time">
+          Total Workout Time: <strong>{formatTime(calculateTotalTime())}</strong>
         </div>
       </div>
 
