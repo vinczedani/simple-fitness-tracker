@@ -149,7 +149,7 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
             <input
               type="number"
               inputMode="numeric"
-              value={config.rounds || 1}
+              value={config.rounds}
               onChange={(e) => onConfigChange({
                 ...config,
                 rounds: parseInt(e.target.value)
@@ -163,7 +163,7 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
             <input
               type="number"
               inputMode="numeric"
-              value={config.roundBreakTime || 30}
+              value={config.roundBreakTime}
               onChange={(e) => onConfigChange({
                 ...config,
                 roundBreakTime: parseInt(e.target.value)
