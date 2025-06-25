@@ -1,69 +1,90 @@
-# React + TypeScript + Vite
+# Simple Fitness Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimalist HIIT workout timer with a focus on readability and ease of use during workouts.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Two-Screen Interface**: Configuration screen and full-screen timer
+- **Exercise Management**: Add, edit, and remove exercises with custom work/rest times
+- **Visual Timer**: Large countdown display with color-coded phases (green for work, red for rest)
+- **Sound Effects**: Audio cues for phase changes, countdown, and workout completion
+- **Keyboard Shortcuts**:
+  - Space: Pause/Resume
+  - Arrow Left/Right: Previous/Next exercise
+- **Data Persistence**: Configuration saved to localStorage
+- **Responsive Design**: Works on desktop and mobile
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+1. Install dependencies:
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. Start development server:
+```bash
+npm run dev
 ```
+
+3. Open your browser to the local development URL
+
+## Usage
+
+### Configuration Screen
+1. Add exercises using the "+ Add Exercise" button
+2. Set exercise names, work time, and rest time for each exercise
+3. Click "Start Workout" to begin
+
+### Timer Screen
+- Large countdown timer in the center
+- Color-coded background (green = work, red = rest)
+- Exercise name and progress indicator
+- Pause/Resume and Stop controls
+- Keyboard shortcuts for quick navigation
+
+## Tech Stack
+
+- React 19
+- TypeScript
+- Vite 6
+- Web Audio API for sound effects
+- localStorage for data persistence
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
+
+# Run linting
+npm run lint
+```
+
+## Project Structure
+
+```
+src/
+├── App.tsx          # Main application component
+├── App.css          # Application styles
+├── utils/
+│   └── audio.ts     # Audio management utility
+└── main.tsx         # Application entry point
+```
+
+## Future Enhancements
+
+- Voice guidance
+- Dark mode
+- Workout presets (Tabata, AMRAP, etc.)
+- Workout history and statistics
+- Export/import workout configurations
+- Smartwatch integration
