@@ -1,6 +1,7 @@
 # Simple Fitness Timer
 
 A minimalist HIIT workout timer with a focus on readability and ease of use during workouts.
+99% of the app was built by purely using ai prompts, in ~3h total.
 
 ## Features
 
