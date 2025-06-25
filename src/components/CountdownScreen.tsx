@@ -31,7 +31,7 @@ export const CountdownScreen: React.FC<CountdownScreenProps> = ({ onComplete }) 
   return (
     <div className="countdown-screen">
       <div className="countdown-content">
-        <div className="countdown-number pulse">{count}</div>
+        <div className="countdown-number pulse">{count === 0 ? 'GO!' : count}</div>
         <div className="countdown-text">Get Ready!</div>
       </div>
     </div>

@@ -108,8 +108,9 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
                 <label>Work (s)</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   value={exercise.workTime}
-                  onChange={(e) => updateExercise(exercise.id, 'workTime', parseInt(e.target.value) || 0)}
+                  onChange={(e) => updateExercise(exercise.id, 'workTime', parseInt(e.target.value))}
                   min="1"
                   className="time-input"
                 />
@@ -118,8 +119,9 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
                 <label>Rest (s)</label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   value={exercise.restTime}
-                  onChange={(e) => updateExercise(exercise.id, 'restTime', parseInt(e.target.value) || 0)}
+                    onChange={(e) => updateExercise(exercise.id, 'restTime', parseInt(e.target.value))}
                   min="0"
                   className="time-input"
                 />
@@ -146,10 +148,11 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
             <label>Number of Rounds</label>
             <input
               type="number"
+              inputMode="numeric"
               value={config.rounds || 1}
               onChange={(e) => onConfigChange({
                 ...config,
-                rounds: parseInt(e.target.value) || 1
+                rounds: parseInt(e.target.value)
               })}
               min="1"
               className="rounds-input"
@@ -159,10 +162,11 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
             <label>Break (s)</label>
             <input
               type="number"
+              inputMode="numeric"
               value={config.roundBreakTime || 30}
               onChange={(e) => onConfigChange({
                 ...config,
-                roundBreakTime: parseInt(e.target.value) || 30
+                roundBreakTime: parseInt(e.target.value)
               })}
               min="0"
               className="rounds-input"

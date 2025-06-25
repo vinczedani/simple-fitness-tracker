@@ -13,7 +13,7 @@ export default defineConfig({
       manifest: {
         name: 'Simple Fitness Timer',
         short_name: 'Simple Fitness Timer',
-        theme_color: '#ffffff',
+        theme_color: '#33234E',
         icons: [
             {
                 src: 'pwa-64x64.png',

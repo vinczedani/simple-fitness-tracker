@@ -21,9 +21,54 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
   const [currentRound, setCurrentRound] = React.useState(1)
   const [touchStart, setTouchStart] = React.useState<number | null>(null)
   const [touchEnd, setTouchEnd] = React.useState<number | null>(null)
+  const [wakeLock, setWakeLock] = React.useState<any>(null)
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50
+
+  // Screen wake lock functionality
+  const requestWakeLock = async () => {
+    try {
+      if ('wakeLock' in navigator) {
+        const wakeLockSentinel = await (navigator as any).wakeLock.request('screen')
+        setWakeLock(wakeLockSentinel)
+
+        // Handle wake lock release
+        wakeLockSentinel.addEventListener('release', () => {
+          setWakeLock(null)
+        })
+      }
+    } catch (err) {
+      console.log('Wake Lock not supported or permission denied')
+    }
+  }
+
+  const releaseWakeLock = () => {
+    if (wakeLock) {
+      wakeLock.release()
+      setWakeLock(null)
+    }
+  }
+
+  // Manage wake lock based on workout state
+  useEffect(() => {
+    if (isRunning && !showCountdown && !isWorkoutComplete) {
+      requestWakeLock()
+    } else {
+      releaseWakeLock()
+    }
+
+    return () => {
+      releaseWakeLock()
+    }
+  }, [isRunning, showCountdown, isWorkoutComplete])
+
+  // Cleanup wake lock on component unmount
+  useEffect(() => {
+    return () => {
+      releaseWakeLock()
+    }
+  }, [])
 
   const startWorkout = () => {
     setShowCountdown(false)
