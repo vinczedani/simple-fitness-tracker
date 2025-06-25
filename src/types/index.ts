@@ -7,4 +7,6 @@ export interface Exercise {
 
 export interface WorkoutConfig {
   exercises: Exercise[]
+  rounds: number
+  roundBreakTime: number
 }

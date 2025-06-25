@@ -92,6 +92,38 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
         </button>
       </div>
 
+      <div className="rounds-section">
+        <h2>Rounds</h2>
+        <div className="rounds-config">
+          <div className="rounds-input-group">
+            <label>Number of Rounds</label>
+            <input
+              type="number"
+              value={config.rounds || 1}
+              onChange={(e) => onConfigChange({
+                ...config,
+                rounds: parseInt(e.target.value) || 1
+              })}
+              min="1"
+              className="rounds-input"
+            />
+          </div>
+          <div className="rounds-input-group">
+            <label>Break Between Rounds (s)</label>
+            <input
+              type="number"
+              value={config.roundBreakTime || 30}
+              onChange={(e) => onConfigChange({
+                ...config,
+                roundBreakTime: parseInt(e.target.value) || 30
+              })}
+              min="0"
+              className="rounds-input"
+            />
+          </div>
+        </div>
+      </div>
+
       <button
         onClick={onStartWorkout}
         disabled={config.exercises.length === 0}

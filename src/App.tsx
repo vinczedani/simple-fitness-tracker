@@ -6,15 +6,24 @@ import './App.css'
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState<'config' | 'timer'>('config')
-  const [config, setConfig] = useState<WorkoutConfig>({ exercises: [] })
+  const [config, setConfig] = useState<WorkoutConfig>({
+    exercises: [],
+    rounds: 1,
+    roundBreakTime: 30
+  })
 
   // Load config from localStorage on mount
   useEffect(() => {
     const savedConfig = localStorage.getItem('fitness-tracker-config')
     if (savedConfig) {
-      const config = JSON.parse(savedConfig)
-      if (config.exercises.length > 0) {
-        setConfig(config)
+      const parsedConfig = JSON.parse(savedConfig)
+      // Ensure backward compatibility with old configs that don't have rounds
+      if (parsedConfig.exercises.length > 0) {
+        setConfig({
+          exercises: parsedConfig.exercises,
+          rounds: parsedConfig.rounds || 1,
+          roundBreakTime: parsedConfig.roundBreakTime || 30
+        })
       }
     }
   }, [])
