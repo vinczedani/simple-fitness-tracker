@@ -41,11 +41,12 @@ export const WorkoutListScreen: React.FC<WorkoutListScreenProps> = ({
 
   return (
     <div className="workout-list-screen">
-      <h1>My Workouts</h1>
-
-      <button onClick={onCreateNew} className="create-workout-btn">
-        + Create New Workout
-      </button>
+      <div className="workout-list-header">
+        <h1 className="workout-list-title">Workouts</h1>
+        <button onClick={onCreateNew} className="create-workout-btn">
+          + <span className="create-workout-btn-text">Create New Workout</span>
+        </button>
+      </div>
 
       {savedWorkouts.length === 0 ? (
         <div className="empty-state">
@@ -54,7 +55,7 @@ export const WorkoutListScreen: React.FC<WorkoutListScreenProps> = ({
       ) : (
         <div className="workout-grid">
           {savedWorkouts.map((workout) => (
-            <div key={workout.id} className="workout-card">
+            <div key={workout.id} className="workout-card" onClick={() => onEditWorkout(workout)}>
               <div className="workout-header">
                 <h3>{workout.name}</h3>
                 <button
@@ -72,38 +73,35 @@ export const WorkoutListScreen: React.FC<WorkoutListScreenProps> = ({
                 <div className="workout-stats">
                   <span>{workout.config.exercises.length} exercises</span>
                   <span>{workout.config.rounds || 1} round{workout.config.rounds !== 1 ? 's' : ''}</span>
-                  <span>{formatTime(calculateTotalTime(workout.config))}</span>
+                </div>
+
+                <div className="workout-time">
+                  <span className="time-label">Time:</span>
+                  <span className="time-value">{formatTime(calculateTotalTime(workout.config))}</span>
                 </div>
 
                 <div className="workout-exercises">
                   {workout.config.exercises.slice(0, 3).map((exercise, index) => (
-                    <span key={exercise.id} className="exercise-tag">
+                    <span key={exercise.id} className="exercise-pill">
                       {exercise.name}
                     </span>
                   ))}
                   {workout.config.exercises.length > 3 && (
-                    <span className="exercise-tag more">
+                    <span className="exercise-pill more">
                       +{workout.config.exercises.length - 3} more
                     </span>
                   )}
                 </div>
-
-                <div className="workout-date">
-                  Updated: {formatDate(workout.updatedAt)}
-                </div>
               </div>
 
               <button
-                onClick={() => onSelectWorkout(workout)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onSelectWorkout(workout)
+                }}
                 className="select-workout-btn"
               >
                 Start Workout
-              </button>
-              <button
-                onClick={() => onEditWorkout(workout)}
-                className="edit-workout-btn"
-              >
-                Edit
               </button>
             </div>
           ))}

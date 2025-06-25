@@ -76,7 +76,7 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
     <div className="config-screen">
       <div className="config-header">
         <button onClick={onBackToList} className="back-btn">
-          ← Back to Workouts
+          ← <span className="back-btn-text">Back to Workouts</span>
         </button>
         <h1>{isNewWorkout ? 'Create New Workout' : 'Edit Workout'}</h1>
       </div>
@@ -156,7 +156,7 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
             />
           </div>
           <div className="rounds-input-group">
-            <label>Break Between Rounds (s)</label>
+            <label>Break (s)</label>
             <input
               type="number"
               value={config.roundBreakTime || 30}
