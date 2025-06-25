@@ -4,14 +4,15 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/simple-fitness-tracker/',
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.ico'],
       manifest: {
-        name: 'Simple Fitness Tracker',
-        short_name: 'Simple Fitness Tracker',
+        name: 'Simple Fitness Timer',
+        short_name: 'Simple Fitness Timer',
         theme_color: '#ffffff',
         icons: [
             {

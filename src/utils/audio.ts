@@ -1,7 +1,6 @@
 // Simple audio utility for fitness tracker sound effects
 class AudioManager {
   private audioContext: AudioContext | null = null;
-  private sounds: Map<string, AudioBuffer> = new Map();
 
   constructor() {
     this.initAudioContext();

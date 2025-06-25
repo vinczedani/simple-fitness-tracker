@@ -1,5 +1,5 @@
 import React from 'react'
-import type { Exercise, WorkoutConfig, SavedWorkout } from '../types'
+import type { Exercise, WorkoutConfig } from '../types'
 
 interface ConfigScreenProps {
   config: WorkoutConfig

@@ -1,4 +1,4 @@
-# Simple Fitness Tracker
+# Simple Fitness Timer
 
 A minimalist HIIT workout timer with a focus on readability and ease of use during workouts.
 
