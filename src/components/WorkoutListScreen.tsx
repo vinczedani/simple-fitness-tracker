@@ -77,7 +77,7 @@ export const WorkoutListScreen: React.FC<WorkoutListScreenProps> = ({
                 </div>
 
                 <div className="workout-exercises">
-                  {workout.config.exercises.slice(0, 8).map((exercise, index) => (
+                  {workout.config.exercises.slice(0, 8).map((exercise) => (
                     <span key={exercise.id} className="exercise-pill">
                       {exercise.name}
                     </span>
