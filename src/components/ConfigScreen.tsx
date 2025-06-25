@@ -1,16 +1,24 @@
 import React from 'react'
-import type { Exercise, WorkoutConfig } from '../types'
+import type { Exercise, WorkoutConfig, SavedWorkout } from '../types'
 
 interface ConfigScreenProps {
   config: WorkoutConfig
+  workoutName: string
   onConfigChange: (config: WorkoutConfig) => void
+  onWorkoutNameChange: (name: string) => void
   onStartWorkout: () => void
+  onBackToList: () => void
+  isNewWorkout?: boolean
 }
 
 export const ConfigScreen: React.FC<ConfigScreenProps> = ({
   config,
+  workoutName,
   onConfigChange,
-  onStartWorkout
+  onWorkoutNameChange,
+  onStartWorkout,
+  onBackToList,
+  isNewWorkout
 }) => {
   const addExercise = () => {
     const newExercise: Exercise = {
@@ -66,7 +74,23 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
 
   return (
     <div className="config-screen">
-      <h1>Fitness Timer</h1>
+      <div className="config-header">
+        <button onClick={onBackToList} className="back-btn">
+          ← Back to Workouts
+        </button>
+        <h1>{isNewWorkout ? 'Create New Workout' : 'Edit Workout'}</h1>
+      </div>
+
+      <div className="workout-name-section">
+        <h2>Workout Name</h2>
+        <input
+          type="text"
+          value={workoutName}
+          onChange={(e) => onWorkoutNameChange(e.target.value)}
+          placeholder="Enter workout name"
+          className="workout-name-input"
+        />
+      </div>
 
       <div className="exercises-section">
         <h2>Exercises</h2>
@@ -150,13 +174,15 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
         </div>
       </div>
 
-      <button
-        onClick={onStartWorkout}
-        disabled={config.exercises.length === 0}
-        className="start-btn"
-      >
-        Start Workout
-      </button>
+      <div className="action-buttons">
+        <button
+          onClick={onStartWorkout}
+          disabled={config.exercises.length === 0 || !workoutName.trim()}
+          className="start-btn"
+        >
+          Start Workout
+        </button>
+      </div>
     </div>
   )
 }

@@ -10,3 +10,11 @@ export interface WorkoutConfig {
   rounds: number
   roundBreakTime: number
 }
+
+export interface SavedWorkout {
+  id: string
+  name: string
+  config: WorkoutConfig
+  createdAt: number
+  updatedAt: number
+}
