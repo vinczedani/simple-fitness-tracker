@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { ConfigScreen } from './components/ConfigScreen'
 import { TimerScreen } from './components/TimerScreen'
 import { WorkoutListScreen } from './components/WorkoutListScreen'
+import { MuteButton } from './components/MuteButton'
 import type { WorkoutConfig, SavedWorkout } from './types'
 import './App.css'
 
@@ -160,35 +161,44 @@ function App() {
 
   if (currentScreen === 'timer' && currentWorkout) {
     return (
-      <TimerScreen
-        config={currentWorkout.config}
-        onStopWorkout={handleStopWorkout}
-      />
+      <>
+        <TimerScreen
+          config={currentWorkout.config}
+          onStopWorkout={handleStopWorkout}
+        />
+        <MuteButton />
+      </>
     )
   }
 
   if (currentScreen === 'config' && editingWorkout) {
     return (
-      <ConfigScreen
-        config={editingWorkout.config}
-        workoutName={workoutName}
-        onConfigChange={handleConfigChange}
-        onWorkoutNameChange={handleWorkoutNameChange}
-        onStartWorkout={handleStartWorkout}
-        onBackToList={handleBackToList}
-        isNewWorkout={!savedWorkouts.find(w => w.id === editingWorkout.id)}
-      />
+      <>
+        <ConfigScreen
+          config={editingWorkout.config}
+          workoutName={workoutName}
+          onConfigChange={handleConfigChange}
+          onWorkoutNameChange={handleWorkoutNameChange}
+          onStartWorkout={handleStartWorkout}
+          onBackToList={handleBackToList}
+          isNewWorkout={!savedWorkouts.find(w => w.id === editingWorkout.id)}
+        />
+        <MuteButton />
+      </>
     )
   }
 
   return (
-    <WorkoutListScreen
-      savedWorkouts={savedWorkouts}
-      onSelectWorkout={handleSelectWorkout}
-      onDeleteWorkout={handleDeleteWorkout}
-      onCreateNew={handleCreateNew}
-      onEditWorkout={handleEditWorkout}
-    />
+    <>
+      <WorkoutListScreen
+        savedWorkouts={savedWorkouts}
+        onSelectWorkout={handleSelectWorkout}
+        onDeleteWorkout={handleDeleteWorkout}
+        onCreateNew={handleCreateNew}
+        onEditWorkout={handleEditWorkout}
+      />
+      <MuteButton />
+    </>
   )
 }
 

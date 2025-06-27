@@ -1,6 +1,7 @@
 // Simple audio utility for fitness tracker sound effects
 class AudioManager {
   private audioContext: AudioContext | null = null;
+  private isMuted: boolean = false
 
   constructor() {
     this.initAudioContext();
@@ -8,8 +9,8 @@ class AudioManager {
 
   private initAudioContext() {
     try {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-    } catch (error) {
+      this.audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    } catch {
       console.warn('Audio context not supported');
     }
   }
@@ -32,6 +33,10 @@ class AudioManager {
 
   async playBeep(frequency: number = 800, duration: number = 0.1) {
     try {
+      if (this.isMuted) {
+        return
+      }
+
       if (!this.audioContext) {
         this.initAudioContext();
       }
@@ -48,6 +53,14 @@ class AudioManager {
     } catch (error) {
       console.warn('Could not play audio:', error);
     }
+  }
+
+  setMuted(muted: boolean) {
+    this.isMuted = muted
+  }
+
+  isAudioMuted(): boolean {
+    return this.isMuted
   }
 
   async playCountdownBeep() {
