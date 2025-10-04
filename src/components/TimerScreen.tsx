@@ -70,12 +70,16 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     }
   }, [])
 
-  const startWorkout = () => {
+  const startWorkout = async () => {
+    // Unlock audio for iOS PWA
+    await audioManager.unlockAudio()
     setShowCountdown(false)
     setIsRunning(true)
   }
 
-  const restartWorkout = () => {
+  const restartWorkout = async () => {
+    // Unlock audio for iOS PWA
+    await audioManager.unlockAudio()
     setCurrentExerciseIndex(0)
     setCurrentPhase('work')
     setTimeLeft(config.exercises[0].workTime)
