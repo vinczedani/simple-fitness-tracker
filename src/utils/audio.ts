@@ -140,39 +140,35 @@ class AudioManager {
   }
 
   // Unlock audio - call this when user starts workout
-  async unlockAudio(): Promise<boolean> {
+  // Must be called synchronously in a user gesture event handler for iOS
+  unlockAudio(): void {
     try {
       if (!this.audioContext) {
         console.log('No audio context available');
-        return false;
+        return;
       }
 
       console.log('Audio context state before unlock:', this.audioContext.state);
 
-      // Try to resume the audio context
+      // Resume synchronously (don't await) - iOS requires this to happen in the user gesture
       if (this.audioContext.state === 'suspended') {
-        try {
-          await this.audioContext.resume();
-          console.log('Audio context resumed, new state:', this.audioContext.state);
-        } catch (error) {
-          console.warn('Could not resume audio context:', error);
-        }
-      }
+        this.audioContext.resume()
+          .then(() => {
+            console.log('Audio context resumed, new state:', this.audioContext?.state);
 
-      // Play a silent beep to fully unlock iOS audio
-      try {
-        await this.playBeep(1, 0.001); // Very quiet, very short
-        console.log('Silent unlock beep played');
-      } catch (error) {
-        console.warn('Could not play unlock beep:', error);
+            // Play a silent beep to fully unlock iOS audio
+            this.playBeep(1, 0.001)
+              .then(() => console.log('Silent unlock beep played'))
+              .catch(err => console.warn('Could not play unlock beep:', err));
+          })
+          .catch(error => {
+            console.warn('Could not resume audio context:', error);
+          });
+      } else {
+        console.log('Audio context already running');
       }
-
-      const success = this.audioContext.state === 'running';
-      console.log('Audio unlock result:', success);
-      return success;
     } catch (error) {
       console.error('Audio unlock failed:', error);
-      return false;
     }
   }
 
