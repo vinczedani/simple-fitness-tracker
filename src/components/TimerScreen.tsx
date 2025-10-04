@@ -70,9 +70,7 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     }
   }, [])
 
-  const startWorkout = async () => {
-    // Unlock audio for iOS PWA
-    await audioManager.unlockAudio()
+  const startWorkout = () => {
     setShowCountdown(false)
     setIsRunning(true)
   }
@@ -96,7 +94,6 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     const restTime = currentExercise?.restTime || 0
     setTimeLeft(restTime)
     audioManager.playPhaseChangeBeep()
-    return restTime
   }
 
   const transitionToNextExercise = () => {
@@ -107,7 +104,6 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     const workTime = nextExercise?.workTime || 0
     setTimeLeft(workTime)
     audioManager.playPhaseChangeBeep()
-    return workTime
   }
 
   const transitionToRoundBreak = () => {
@@ -115,7 +111,6 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     const breakTime = config.roundBreakTime || 30
     setTimeLeft(breakTime)
     audioManager.playPhaseChangeBeep()
-    return breakTime
   }
 
   const transitionToNextRound = () => {
@@ -127,14 +122,12 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     const workTime = firstExercise?.workTime || 0
     setTimeLeft(workTime)
     audioManager.playStartBeep()
-    return workTime
   }
 
   const completeWorkout = () => {
     setIsRunning(false)
     setIsWorkoutComplete(true)
     audioManager.playWorkoutCompleteBeep()
-    return 0
   }
 
   const goToPreviousExercise = () => {
@@ -235,52 +228,14 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     }
   }, [config.exercises])
 
-  // Timer logic
+  // Timer countdown
   useEffect(() => {
     let interval: number | undefined
 
     if (isRunning && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prev) => {
-          if (prev <= 1) {
-            // Phase complete, move to next
-            if (currentPhase === 'work') {
-              // Check if this is the last exercise of the current round
-              if (currentExerciseIndex === config.exercises.length - 1) {
-                // Last exercise of current round - check if we need rest
-                if (currentRound < (config.rounds || 1)) {
-                  // Not the last round, go to rest first
-                  return transitionToRest()
-                } else {
-                  // Last round, workout complete - no rest needed
-                  return completeWorkout()
-                }
-              } else {
-                // Move to rest phase
-                return transitionToRest()
-              }
-            } else if (currentPhase === 'rest') {
-              // Rest complete, move to next exercise or round
-              if (currentExerciseIndex < config.exercises.length - 1) {
-                // Not the last exercise, go to next exercise
-                return transitionToNextExercise()
-              } else {
-                // Last exercise of current round - check if we need to go to next round
-                if (currentRound < (config.rounds || 1)) {
-                  // Not the last round, go to round break
-                  return transitionToRoundBreak()
-                } else {
-                  // Last round, workout complete
-                  return completeWorkout()
-                }
-              }
-            } else if (currentPhase === 'roundBreak') {
-              // Round break complete, start next round
-              return transitionToNextRound()
-            }
-          }
-
-          const nextSec = prev - 1;
+          const nextSec = prev - 1
 
           // Play countdown beep for last 3 seconds
           if (nextSec <= 3 && nextSec > 0) {
@@ -295,7 +250,48 @@ export const TimerScreen: React.FC<TimerScreenProps> = ({
     return () => {
       if (interval) clearInterval(interval)
     }
-  }, [isRunning, timeLeft, currentPhase, currentExerciseIndex, currentRound, config.exercises, config.rounds, config.roundBreakTime])
+  }, [isRunning, timeLeft])
+
+  // Handle phase transitions when timer reaches 0
+  useEffect(() => {
+    if (!isRunning || timeLeft > 0) return
+
+    // Timer hit 0, handle phase transition
+    if (currentPhase === 'work') {
+      // Check if this is the last exercise of the current round
+      if (currentExerciseIndex === config.exercises.length - 1) {
+        // Last exercise of current round - check if we need rest
+        if (currentRound < (config.rounds || 1)) {
+          // Not the last round, go to rest first
+          transitionToRest()
+        } else {
+          // Last round, workout complete - no rest needed
+          completeWorkout()
+        }
+      } else {
+        // Move to rest phase
+        transitionToRest()
+      }
+    } else if (currentPhase === 'rest') {
+      // Rest complete, move to next exercise or round
+      if (currentExerciseIndex < config.exercises.length - 1) {
+        // Not the last exercise, go to next exercise
+        transitionToNextExercise()
+      } else {
+        // Last exercise of current round - check if we need to go to next round
+        if (currentRound < (config.rounds || 1)) {
+          // Not the last round, go to round break
+          transitionToRoundBreak()
+        } else {
+          // Last round, workout complete
+          completeWorkout()
+        }
+      }
+    } else if (currentPhase === 'roundBreak') {
+      // Round break complete, start next round
+      transitionToNextRound()
+    }
+  }, [timeLeft, isRunning, currentPhase, currentExerciseIndex, currentRound, config.exercises, config.rounds])
 
   // Keyboard shortcuts
   useEffect(() => {

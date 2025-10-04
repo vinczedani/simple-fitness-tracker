@@ -3,6 +3,7 @@ import { ConfigScreen } from './components/ConfigScreen'
 import { TimerScreen } from './components/TimerScreen'
 import { WorkoutListScreen } from './components/WorkoutListScreen'
 import { MuteButton } from './components/MuteButton'
+import { audioManager } from './utils/audio'
 import type { WorkoutConfig, SavedWorkout } from './types'
 import './App.css'
 
@@ -70,6 +71,8 @@ function App() {
   }
 
   const handleSelectWorkout = (workout: SavedWorkout) => {
+    // Try to unlock audio when user taps "Start Workout" (non-blocking)
+    audioManager.unlockAudio()
     setCurrentWorkout(workout)
     setCurrentScreen('timer')
   }
@@ -136,6 +139,9 @@ function App() {
 
   const handleStartWorkout = () => {
     if (!editingWorkout || !workoutName.trim()) return
+
+    // Try to unlock audio when user starts workout (non-blocking)
+    audioManager.unlockAudio()
 
     const workoutToStart: SavedWorkout = {
       ...editingWorkout,

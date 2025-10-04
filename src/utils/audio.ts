@@ -143,21 +143,35 @@ class AudioManager {
   async unlockAudio(): Promise<boolean> {
     try {
       if (!this.audioContext) {
+        console.log('No audio context available');
         return false;
       }
 
-      try {
-        if (this.audioContext.state === 'suspended') {
+      console.log('Audio context state before unlock:', this.audioContext.state);
+
+      // Try to resume the audio context
+      if (this.audioContext.state === 'suspended') {
+        try {
           await this.audioContext.resume();
-          return true;
+          console.log('Audio context resumed, new state:', this.audioContext.state);
+        } catch (error) {
+          console.warn('Could not resume audio context:', error);
         }
-        return this.audioContext.state === 'running';
-      } catch (error) {
-        console.warn('Could not unlock audio:', error);
-        return false;
       }
+
+      // Play a silent beep to fully unlock iOS audio
+      try {
+        await this.playBeep(1, 0.001); // Very quiet, very short
+        console.log('Silent unlock beep played');
+      } catch (error) {
+        console.warn('Could not play unlock beep:', error);
+      }
+
+      const success = this.audioContext.state === 'running';
+      console.log('Audio unlock result:', success);
+      return success;
     } catch (error) {
-      console.warn('Could not unlock audio:', error);
+      console.error('Audio unlock failed:', error);
       return false;
     }
   }
