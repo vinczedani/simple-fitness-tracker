@@ -141,16 +141,21 @@ class AudioManager {
 
   // Unlock audio - call this when user starts workout
   async unlockAudio(): Promise<boolean> {
-    if (!this.audioContext) {
-      return false;
-    }
-
     try {
-      if (this.audioContext.state === 'suspended') {
-        await this.audioContext.resume();
-        return true;
+      if (!this.audioContext) {
+        return false;
       }
-      return this.audioContext.state === 'running';
+
+      try {
+        if (this.audioContext.state === 'suspended') {
+          await this.audioContext.resume();
+          return true;
+        }
+        return this.audioContext.state === 'running';
+      } catch (error) {
+        console.warn('Could not unlock audio:', error);
+        return false;
+      }
     } catch (error) {
       console.warn('Could not unlock audio:', error);
       return false;
