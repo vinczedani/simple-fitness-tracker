@@ -25,7 +25,7 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
       id: Date.now().toString(),
       name: `Exercise ${config.exercises.length + 1}`,
       workTime: 30,
-      restTime: 15
+      restTime: 20
     }
     onConfigChange({
       ...config,

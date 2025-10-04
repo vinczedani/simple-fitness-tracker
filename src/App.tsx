@@ -54,7 +54,7 @@ function App() {
       config: {
         exercises: [],
         rounds: 1,
-        roundBreakTime: 30
+        roundBreakTime: 50
       },
       createdAt: Date.now(),
       updatedAt: Date.now()
