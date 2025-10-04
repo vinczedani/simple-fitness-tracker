@@ -20,6 +20,9 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
   onBackToList,
   isNewWorkout
 }) => {
+  const [draggedIndex, setDraggedIndex] = React.useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = React.useState<number | null>(null)
+
   const addExercise = () => {
     const newExercise: Exercise = {
       id: Date.now().toString(),
@@ -47,6 +50,46 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
       ...config,
       exercises: config.exercises.filter(ex => ex.id !== id)
     })
+  }
+
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index)
+  }
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    setDragOverIndex(index)
+  }
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null)
+  }
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault()
+
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null)
+      setDragOverIndex(null)
+      return
+    }
+
+    const newExercises = [...config.exercises]
+    const [draggedExercise] = newExercises.splice(draggedIndex, 1)
+    newExercises.splice(dropIndex, 0, draggedExercise)
+
+    onConfigChange({
+      ...config,
+      exercises: newExercises
+    })
+
+    setDraggedIndex(null)
+    setDragOverIndex(null)
+  }
+
+  const handleDragEnd = () => {
+    setDraggedIndex(null)
+    setDragOverIndex(null)
   }
 
   const calculateTotalTime = () => {
@@ -94,8 +137,20 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
 
       <div className="exercises-section">
         <h2>Exercises</h2>
-        {config.exercises.map((exercise) => (
-          <div key={exercise.id} className="exercise-item">
+        {config.exercises.map((exercise, index) => (
+          <div
+            key={exercise.id}
+            className={`exercise-item ${draggedIndex === index ? 'dragging' : ''} ${dragOverIndex === index ? 'drag-over' : ''}`}
+            draggable
+            onDragStart={() => handleDragStart(index)}
+            onDragOver={(e) => handleDragOver(e, index)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, index)}
+            onDragEnd={handleDragEnd}
+          >
+            <div className="drag-handle" title="Drag to reorder">
+              ⋮⋮
+            </div>
             <input
               type="text"
               value={exercise.name}

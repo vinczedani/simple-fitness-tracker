@@ -1,5 +1,6 @@
 import React from 'react'
 import type { SavedWorkout, WorkoutConfig } from '../types'
+import { ConfirmDialog } from './ConfirmDialog'
 
 interface WorkoutListScreenProps {
   savedWorkouts: SavedWorkout[]
@@ -17,9 +18,26 @@ export const WorkoutListScreen: React.FC<WorkoutListScreenProps> = ({
   onCreateNew
 }) => {
   const [isReversed, setIsReversed] = React.useState(false)
+  const [workoutToDelete, setWorkoutToDelete] = React.useState<SavedWorkout | null>(null)
 
   const toggleSort = () => {
     setIsReversed(!isReversed)
+  }
+
+  const handleDeleteClick = (e: React.MouseEvent, workout: SavedWorkout) => {
+    e.stopPropagation()
+    setWorkoutToDelete(workout)
+  }
+
+  const confirmDelete = () => {
+    if (workoutToDelete) {
+      onDeleteWorkout(workoutToDelete.id)
+      setWorkoutToDelete(null)
+    }
+  }
+
+  const cancelDelete = () => {
+    setWorkoutToDelete(null)
   }
 
   const displayWorkouts = isReversed ? [...savedWorkouts].reverse() : savedWorkouts
@@ -68,10 +86,7 @@ export const WorkoutListScreen: React.FC<WorkoutListScreenProps> = ({
               <div className="workout-header">
                 <h3>{workout.name}</h3>
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    onDeleteWorkout(workout.id)
-                  }}
+                  onClick={(e) => handleDeleteClick(e, workout)}
                   className="delete-workout-btn"
                 >
                   ×
@@ -116,6 +131,16 @@ export const WorkoutListScreen: React.FC<WorkoutListScreenProps> = ({
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={workoutToDelete !== null}
+        title="Delete Workout"
+        message={`Are you sure you want to delete "${workoutToDelete?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </div>
   )
 }

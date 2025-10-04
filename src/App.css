@@ -505,6 +505,7 @@ body {
   margin-bottom: 1rem;
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.2s;
+  cursor: grab;
 }
 
 .exercise-item:hover {
@@ -922,6 +923,11 @@ body {
     gap: 0.75rem;
   }
 
+  .drag-handle {
+    align-self: center;
+    font-size: 1.5rem;
+  }
+
   .time-inputs {
     justify-content: space-between;
   }
@@ -1016,4 +1022,130 @@ body {
     width: 44px;
     height: 44px;
   }
+}
+
+/* Modal / Confirm Dialog */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: rgba(30, 32, 50, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  animation: modalSlideIn 0.2s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-title {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+.modal-message {
+  color: #f3f4fa;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.modal-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.modal-btn-cancel {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.modal-btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.modal-btn-confirm {
+  background: rgba(239, 68, 68, 0.8);
+  color: #fff;
+}
+
+.modal-btn-confirm:hover {
+  background: rgba(239, 68, 68, 0.9);
+  transform: translateY(-2px);
+}
+
+/* Drag and Drop Styles */
+.exercise-item:active {
+  cursor: grabbing;
+}
+
+.exercise-item.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.exercise-item.drag-over {
+  border-color: rgba(102, 126, 234, 0.8) !important;
+  background: rgba(102, 126, 234, 0.15) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2) !important;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1.2rem;
+  user-select: none;
+  padding: 0.25rem;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.drag-handle:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.drag-handle:active {
+  cursor: grabbing;
 }
