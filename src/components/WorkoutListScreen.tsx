@@ -16,6 +16,14 @@ export const WorkoutListScreen: React.FC<WorkoutListScreenProps> = ({
   onDeleteWorkout,
   onCreateNew
 }) => {
+  const [isReversed, setIsReversed] = React.useState(false)
+
+  const toggleSort = () => {
+    setIsReversed(!isReversed)
+  }
+
+  const displayWorkouts = isReversed ? [...savedWorkouts].reverse() : savedWorkouts
+
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -39,9 +47,14 @@ export const WorkoutListScreen: React.FC<WorkoutListScreenProps> = ({
     <div className="workout-list-screen">
       <div className="workout-list-header">
         <h1 className="workout-list-title">Workouts</h1>
-        <button onClick={onCreateNew} className="create-workout-btn">
-          + <span className="create-workout-btn-text">Create New Workout</span>
-        </button>
+        <div className="workout-list-actions">
+          <button onClick={toggleSort} className="sort-workout-btn" title={isReversed ? "Sort: Newest First" : "Sort: Oldest First"}>
+            {isReversed ? "↑" : "↓"}
+          </button>
+          <button onClick={onCreateNew} className="create-workout-btn">
+            + <span className="create-workout-btn-text">Create New Workout</span>
+          </button>
+        </div>
       </div>
 
       {savedWorkouts.length === 0 ? (
@@ -50,7 +63,7 @@ export const WorkoutListScreen: React.FC<WorkoutListScreenProps> = ({
         </div>
       ) : (
         <div className="workout-grid">
-          {savedWorkouts.map((workout) => (
+          {displayWorkouts.map((workout) => (
             <div key={workout.id} className="workout-card" onClick={() => onEditWorkout(workout)}>
               <div className="workout-header">
                 <h3>{workout.name}</h3>

@@ -186,6 +186,7 @@ body {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  gap: 1rem;
 }
 
 .workout-list-title {
@@ -196,12 +197,18 @@ body {
   margin: 0;
 }
 
-.create-workout-btn {
+.workout-list-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.workout-list-actions > button {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.4);
   backdrop-filter: blur(10px);
-  padding: 1.5rem 2rem;
+  padding: 1rem 1.5rem;
   border-radius: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -211,9 +218,10 @@ body {
   display: inline-block;
   text-align: center;
   margin: 0;
+  flex-shrink: 0;
 }
 
-.create-workout-btn:hover {
+.workout-list-actions > button:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
@@ -952,8 +960,12 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .create-workout-btn {
-    padding: 1rem 1.5rem;
+  .workout-list-actions {
+    gap: 0.5rem;
+  }
+
+  .workout-list-actions > button {
+    padding: 0.8rem 1.2rem;
   }
 
   .create-workout-btn-text {
