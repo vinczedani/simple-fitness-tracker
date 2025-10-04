@@ -111,6 +111,7 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
                   inputMode="numeric"
                   value={exercise.workTime}
                   onChange={(e) => updateExercise(exercise.id, 'workTime', parseInt(e.target.value))}
+                  onFocus={(e) => e.target.select()}
                   min="1"
                   className="time-input"
                 />
@@ -122,6 +123,7 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
                   inputMode="numeric"
                   value={exercise.restTime}
                     onChange={(e) => updateExercise(exercise.id, 'restTime', parseInt(e.target.value))}
+                  onFocus={(e) => e.target.select()}
                   min="0"
                   className="time-input"
                 />
@@ -154,6 +156,7 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
                 ...config,
                 rounds: parseInt(e.target.value)
               })}
+              onFocus={(e) => e.target.select()}
               min="1"
               className="rounds-input"
             />
@@ -168,6 +171,7 @@ export const ConfigScreen: React.FC<ConfigScreenProps> = ({
                 ...config,
                 roundBreakTime: parseInt(e.target.value)
               })}
+              onFocus={(e) => e.target.select()}
               min="0"
               className="rounds-input"
             />
